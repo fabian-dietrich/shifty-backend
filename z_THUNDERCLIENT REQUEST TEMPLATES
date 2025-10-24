@@ -1,0 +1,277 @@
+# 🌩️ Thunder Client / API Testing Quick Reference
+
+Copy and paste these into Thunder Client (or any API testing tool)
+
+---
+
+## 🔧 BASE URL
+```
+http://localhost:5005
+```
+
+---
+
+## 1️⃣ TEST SERVER
+**Method:** GET
+**URL:** 
+```
+http://localhost:5005/api
+```
+**Headers:** None
+**Body:** None
+
+**Expected Response:**
+```json
+"All good in here"
+```
+
+---
+
+## 2️⃣ SIGNUP - Register New User
+**Method:** POST
+**URL:**
+```
+http://localhost:5005/auth/signup
+```
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Body (JSON):**
+```json
+{
+  "email": "test@example.com",
+  "username": "testuser",
+  "password": "Test123!"
+}
+```
+
+**Expected Response (201):**
+```json
+{
+  "email": "test@example.com",
+  "username": "testuser",
+  "_id": "..."
+}
+```
+
+**TIP:** Change the email/username for each new user!
+
+---
+
+## 3️⃣ LOGIN - Get JWT Token
+**Method:** POST
+**URL:**
+```
+http://localhost:5005/auth/login
+```
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Body (JSON):**
+```json
+{
+  "email": "test@example.com",
+  "password": "Test123!"
+}
+```
+
+**Expected Response (200):**
+```json
+{
+  "authToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "message": "Login successful! Token valid for 6 hours"
+}
+```
+
+**⚠️ COPY THE authToken - You need it for protected routes!**
+
+---
+
+## 4️⃣ VERIFY - Check Token Validity
+**Method:** GET
+**URL:**
+```
+http://localhost:5005/auth/verify
+```
+
+**Headers:**
+```
+Authorization: Bearer YOUR_TOKEN_HERE
+```
+
+**⚠️ Replace YOUR_TOKEN_HERE with actual token from login!**
+
+**Format Example:**
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OGZhMGZlYTVlMjBiNzhhZWIxOTk0ZDciLCJpYXQiOjE2OTg3NjU0MzIsImV4cCI6MTY5ODc4NzAzMn0.abc123
+```
+
+**Body:** None
+
+**Expected Response (200):**
+```json
+{
+  "message": "Token is valid!",
+  "user": {
+    "_id": "...",
+    "iat": 1698765432,
+    "exp": 1698787032
+  }
+}
+```
+
+---
+
+## 🧪 TESTING WORKFLOW
+
+### Quick Test Sequence:
+1. ✅ Test server is running → GET /api
+2. ✅ Signup a new user → POST /auth/signup
+3. ✅ Login with that user → POST /auth/login (COPY TOKEN!)
+4. ✅ Verify token works → GET /auth/verify (paste token)
+
+### Error Testing:
+5. ❌ Try login with wrong password → Should get 403
+6. ❌ Try signup with duplicate email → Should get 403
+7. ❌ Try verify without token → Should get 403
+8. ❌ Try verify with invalid token → Should get 403
+
+---
+
+## 📝 SAMPLE TEST USERS
+
+Use these for quick testing:
+
+### User 1:
+```json
+{
+  "email": "alice@example.com",
+  "username": "alice",
+  "password": "Alice123!"
+}
+```
+
+### User 2:
+```json
+{
+  "email": "bob@example.com",
+  "username": "bob",
+  "password": "Bob123!"
+}
+```
+
+### User 3:
+```json
+{
+  "email": "charlie@example.com",
+  "username": "charlie",
+  "password": "Charlie123!"
+}
+```
+
+---
+
+## 🔍 STATUS CODES REFERENCE
+
+| Code | Meaning | When You'll See It |
+|------|---------|-------------------|
+| 200 | OK | Successful login, verify |
+| 201 | Created | Successful signup |
+| 403 | Forbidden | Invalid credentials, no/invalid token |
+| 500 | Server Error | Database issues, code errors |
+
+---
+
+## 🐛 COMMON ERRORS & FIXES
+
+### "Invalid Credentials" (403)
+- Wrong email or password on login
+- Email already exists on signup
+- **Fix:** Check credentials or use different email
+
+### "No token found" (403)
+- Missing Authorization header
+- **Fix:** Add header: `Authorization: Bearer TOKEN`
+
+### "Invalid Token" (403)
+- Token expired (>6 hours old)
+- Token malformed or corrupted
+- Wrong TOKEN_SECRET in .env
+- **Fix:** Login again to get fresh token
+
+### "Cannot POST /auth/signup" (404)
+- Server not running
+- Wrong URL
+- **Fix:** Check server is running on :5005
+
+---
+
+## 💾 CLEAR DATABASE COMMANDS
+
+If you need to start fresh:
+
+```bash
+# View all users
+node view-users.js
+
+# Delete all users
+node clear-users.js
+
+# Create a test user
+node test-user.js
+```
+
+---
+
+## 🎯 NEXT STEPS
+
+Once authentication works:
+1. Create more protected routes (profile, settings, etc.)
+2. Connect to React frontend
+3. Add more user fields (avatar, bio, etc.)
+4. Build your app features!
+
+---
+
+## 📱 ALTERNATIVE: cURL Commands
+
+If Thunder Client is giving you trouble, use these terminal commands:
+
+### Signup:
+```bash
+curl -X POST http://localhost:5005/auth/signup \
+  -H "Content-Type: application/json" \
+  -d '{"email":"curl@example.com","username":"curluser","password":"Curl123!"}'
+```
+
+### Login:
+```bash
+curl -X POST http://localhost:5005/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"curl@example.com","password":"Curl123!"}'
+```
+
+### Verify (replace TOKEN with your actual token):
+```bash
+curl -X GET http://localhost:5005/auth/verify \
+  -H "Authorization: Bearer TOKEN"
+```
+
+---
+
+## 🔗 USEFUL LINKS
+
+- MongoDB Compass: mongodb://localhost:27017
+- Backend Server: http://localhost:5005
+- API Base: http://localhost:5005/api
+- Auth Routes: http://localhost:5005/auth
+
+---
+
+**📌 Bookmark this file for quick reference during development!**

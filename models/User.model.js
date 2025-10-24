@@ -10,16 +10,34 @@ const userSchema = new Schema(
       lowercase: true,
       trim: true
     },
+
+   username: {
+      type: String,
+      required: [true, 'Username is required.'],
+      unique: true
+    },
+
     password: {
       type: String,
       required: [true, 'Password is required.']
+    },
+    
+    role: {
+      type: String,
+      enum: ['user', 'admin'],
+      default: 'user'
+    },
+    color: {
+      type: String,
+      default: '#6b066fff'
     }
+    
   },
-  {
-    // this second object adds extra properties: `createdAt` and `updatedAt`    
-    timestamps: true
-  }
-);
+
+    { 
+      timestamps: true
+    }
+  );
 
 const User = model("User", userSchema);
 
