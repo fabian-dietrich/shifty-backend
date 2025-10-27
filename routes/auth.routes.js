@@ -134,18 +134,33 @@ const payload = {
 // ========================================
 // This route is protected by the isAuthenticated middleware
 // The middleware runs FIRST and checks the token
-router.get("/verify", isAuthenticated, (req, res) => {
-  // If we reach here, the token is valid!
-  // The isAuthenticated middleware already verified the token
-  // and attached the decoded data to req.payload
+router.get("/verify", isAuthenticated, async (req, res) => {
+  try {
+    // Fetch the full user data from database
+    const user = await User.findById(req.payload._id).select('-password');
+    
+    if (!user) {
+      return res.status(404).json({ errorMessage: "User not found" });
+    }
 
-  console.log("✅ Token verified for user:", req.payload._id);
+    console.log("✅ Token verified for user:", user.username);
 
-  // Send back the user data from the token
-  res.status(200).json({
-    message: "Token is valid!",
-    user: req.payload  // This contains { _id: "abc123", iat: ..., exp: ... }
-  });
+    res.status(200).json({
+      message: "Token is valid!",
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        color: user.color,
+        iat: req.payload.iat,
+        exp: req.payload.exp
+      }
+    });
+  } catch (error) {
+    console.log("❌ Verify error:", error);
+    res.status(500).json({ errorMessage: "Server error during verification" });
+  }
 });
 
 module.exports = router;
