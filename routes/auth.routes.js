@@ -4,7 +4,7 @@ const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
 
-// Color palette for user avatars (20 distinct colors)
+// Color palette for user avatars
 const COLOR_PALETTE = [
   '#F44336', '#E91E63', '#9C27B0', '#673AB7', '#3F51B5',
   '#2196F3', '#03A9F4', '#00BCD4', '#009688', '#4CAF50',
