@@ -63,7 +63,7 @@ router.post("/signup", async (req, res) => {
       _id: createdUser._id,
     });
   } catch (error) {
-    console.log("❌ Signup error:", error);
+    console.log("Signup error:", error);
     res.status(500).json({ errorMessage: "Server error during signup" });
   }
 });

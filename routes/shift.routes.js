@@ -111,10 +111,10 @@ router.delete("/:id", isAuthenticated, isAdmin, async (req, res) => {
       return res.status(404).json({ errorMessage: "Shift not found" });
     }
 
-    console.log("✅ Shift deleted:", deletedShift._id);
+    console.log("Shift deleted:", deletedShift._id);
     res.status(200).json({ message: "Shift deleted successfully" });
   } catch (error) {
-    console.log("❌ Error deleting shift:", error);
+    console.log("Error deleting shift:", error);
     res.status(500).json({ errorMessage: "Failed to delete shift" });
   }
 });
