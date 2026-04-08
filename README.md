@@ -8,12 +8,14 @@ REST API for [Shifty](https://shifty.fabiandietri.ch), a shift scheduling app bu
  
 [shifty.fabiandietri.ch](https://shifty.fabiandietri.ch)
 
-All demo accounts use the password `shifty2025`.
+~~All demo accounts use the password `shifty2025`.~~
 
 | Account | Role |
 |---|---|
-| sarah@shifty-demo.com | Admin |
-| tom@shifty-demo.com | Employee |
+| ~~sarah@shifty-demo.com~~ | ~~Admin~~ |
+| ~~tom@shifty-demo.com~~ | ~~Employee~~ |
+
+> Direct login is disabled on the live site. Click **Try Demo** on the homepage to start a sandboxed session as an admin — your changes won't affect other visitors.
 
 ## Tech stack
 
