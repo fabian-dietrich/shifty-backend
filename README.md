@@ -1,9 +1,11 @@
 # Shifty — Backend
-
-REST API for [Shifty](https://github.com/fabian-dietrich/shifty-frontend), a shift scheduling app built for small teams. Admins create and assign weekly shifts, employees view their schedule and pick up open slots.
-
+ 
+REST API for [Shifty](https://shifty.fabiandietri.ch), a shift scheduling app built for small teams. Admins create and assign weekly shifts, employees view their schedule and pick up open slots.
+ 
+**Frontend repo:** [shifty-frontend](https://github.com/fabian-dietrich/shifty-frontend)
+ 
 ## Live demo
-
+ 
 [shifty.fabiandietri.ch](https://shifty.fabiandietri.ch)
 
 All demo accounts use the password `shifty2025`.
