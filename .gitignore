@@ -1,11 +1,17 @@
 # Dependency directories
 node_modules/
 
-# Debug log from npm
+# Lockfiles (using bun)
+package-lock.json
+
+# Debug logs
 npm-debug.log
 
 # Environment Variables should NEVER be published
 .env
+
+# Seed script (contains demo credentials, run locally only)
+seed.js
 
 # macOS
 .DS_Store
