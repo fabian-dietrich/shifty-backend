@@ -3,6 +3,8 @@ const User = require("../models/User.model");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
+const { attachDemoSession } = require("../middlewares/isDemo.middleware");
+const { createSession, getActiveSessionCount } = require("../demoStore");
 
 // Color palette for user avatars
 const COLOR_PALETTE = [
@@ -33,6 +35,44 @@ const getRandomColor = () => {
 };
 
 /* ROUTES */
+
+// ── Demo login ───────────────────────────────────────────────
+
+router.post("/demo-login", async (req, res) => {
+  try {
+    const { sessionId, demoUser } = await createSession();
+
+    if (!demoUser) {
+      return res.status(500).json({
+        errorMessage: "No admin user found in seed data. Run the seed script first.",
+      });
+    }
+
+    // Create a JWT that carries the demo session ID
+    const payload = {
+      _id: demoUser._id,
+      role: demoUser.role,
+      demoSessionId: sessionId,
+    };
+
+    const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
+      algorithm: "HS256",
+      expiresIn: "1h",
+    });
+
+    console.log(`🎭 Demo login issued. Active sessions: ${getActiveSessionCount()}`);
+
+    res.status(200).json({
+      authToken,
+      message: "Demo session started. Changes are session-only and will not be saved.",
+    });
+  } catch (error) {
+    console.log("Demo login error:", error);
+    res.status(500).json({ errorMessage: "Failed to start demo session" });
+  }
+});
+
+// ── Signup ────────────────────────────────────────────────────
 
 router.post("/signup", async (req, res) => {
   try {
@@ -68,7 +108,8 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// login
+// ── Login ─────────────────────────────────────────────────────
+
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -110,9 +151,36 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// verify
-router.get("/verify", isAuthenticated, async (req, res) => {
+// ── Verify ────────────────────────────────────────────────────
+
+router.get("/verify", isAuthenticated, attachDemoSession, async (req, res) => {
   try {
+    // Demo session: return user from the in-memory store
+    if (req.isDemo) {
+      const demoUser = req.demoSession.users.find(
+        (u) => u._id === req.payload._id
+      );
+
+      if (!demoUser) {
+        return res.status(404).json({ errorMessage: "Demo user not found" });
+      }
+
+      return res.status(200).json({
+        message: "Token is valid! (demo session)",
+        isDemo: true,
+        user: {
+          _id: demoUser._id,
+          username: demoUser.username,
+          email: demoUser.email,
+          role: demoUser.role,
+          color: demoUser.color,
+          iat: req.payload.iat,
+          exp: req.payload.exp,
+        },
+      });
+    }
+
+    // Regular session: hit the database
     const user = await User.findById(req.payload._id).select("-password");
 
     if (!user) {

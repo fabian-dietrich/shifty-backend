@@ -1,9 +1,19 @@
 const router = require("express").Router();
 const User = require("../models/User.model");
 const { isAuthenticated } = require("../middlewares/jwt.middleware");
+const { attachDemoSession } = require("../middlewares/isDemo.middleware");
 
-router.get("/", isAuthenticated, async (req, res) => {
+router.get("/", isAuthenticated, attachDemoSession, async (req, res) => {
   try {
+    // Demo: return from overlay
+    if (req.isDemo) {
+      const users = [...req.demoSession.users].sort((a, b) =>
+        a.username.localeCompare(b.username)
+      );
+      return res.status(200).json(users);
+    }
+
+    // Real: hit MongoDB
     const users = await User.find().select("-password").sort({ username: 1 });
 
     res.status(200).json(users);
