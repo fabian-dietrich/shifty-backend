@@ -75,6 +75,12 @@ router.post("/demo-login", async (req, res) => {
 // ── Signup ────────────────────────────────────────────────────
 
 router.post("/signup", async (req, res) => {
+  if (process.env.DEMO_ONLY === "true") {
+    return res.status(403).json({
+      errorMessage: "Signup is disabled. Please use the demo instead.",
+    });
+  }
+
   try {
     const { email, username, password } = req.body;
 
@@ -111,6 +117,12 @@ router.post("/signup", async (req, res) => {
 // ── Login ─────────────────────────────────────────────────────
 
 router.post("/login", async (req, res) => {
+  if (process.env.DEMO_ONLY === "true") {
+    return res.status(403).json({
+      errorMessage: "Login is disabled. Please use the Try Demo button instead.",
+    });
+  }
+
   try {
     const { email, password } = req.body;
 
